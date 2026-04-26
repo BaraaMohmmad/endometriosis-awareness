@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#F5C842;--gold-light:#FEF3B0;--gold-dark:#D4A017;--gold-deep:#8B6914;
+  --cream:#FFFDF4;--cream2:#FFF9E6;--warm:#FFF5CC;
+  --text:#2C2415;--text2:#6B5B35;--text3:#9C8860;
+  --white:#ffffff;--border:#F0D98A;
+  --radius:18px;--radius-sm:10px;
+  --font-en:'DM Sans',sans-serif;
+  --font-display:'Playfair Display',serif;
+  --font-ar:'Noto Naskh Arabic',serif;
+}
+body{background:var(--cream);font-family:var(--font-en);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.app{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+/* ─── INTRO ─── */
+#intro{
+  position:fixed;inset:0;z-index:100;
+  background:linear-gradient(160deg,#FFFDF4 0%,#FEF3B0 45%,#FFF9E6 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  animation:introOut 0.7s ease 3s forwards;
+}
+@keyframes introOut{to{opacity:0;pointer-events:none;}}
+
+/* Ribbon SVG animation */
+.ribbon-container{
+  width:200px;height:240px;position:relative;
+  animation:ribbonEntry 1s cubic-bezier(0.34,1.4,0.64,1) forwards;
+  opacity:0;
+}
+@keyframes ribbonEntry{
+  0%{opacity:0;transform:scale(0.5) rotate(-15deg);}
+  60%{opacity:1;transform:scale(1.08) rotate(2deg);}
+  100%{opacity:1;transform:scale(1) rotate(0deg);}
+}
+.ribbon-glow{
+  position:absolute;inset:-20px;
+  background:radial-gradient(circle,rgba(245,200,66,0.25) 0%,transparent 70%);
+  animation:glowPulse 2s ease-in-out 0.8s infinite alternate;
+  border-radius:50%;
+}
+.intro-icon{
+  font-size:150px;
+  position:relative;
+  z-index:2;
+  animation:iconPop 1.2s cubic-bezier(0.34,1.6,0.64,1) forwards;
+  opacity:0;
+}
+
+@keyframes iconPop{
+  0%{opacity:0;transform:scale(0.4) rotate(-10deg);}
+  60%{opacity:1;transform:scale(1.15) rotate(5deg);}
+  100%{opacity:1;transform:scale(1) rotate(0deg);}
+}
+@keyframes glowPulse{from{transform:scale(0.9);opacity:0.6;}to{transform:scale(1.1);opacity:1;}}
+
+/* Floating petals */
+.petal{position:absolute;width:18px;height:18px;border-radius:50% 0;background:var(--gold);opacity:0;animation:petalFloat 1.5s ease forwards;}
+.petal:nth-child(1){top:10px;left:20px;animation-delay:0.6s;transform:rotate(30deg);}
+.petal:nth-child(2){top:30px;right:15px;animation-delay:0.8s;transform:rotate(-45deg);width:12px;height:12px;}
+.petal:nth-child(3){bottom:40px;left:10px;animation-delay:1s;transform:rotate(60deg);width:14px;height:14px;opacity:0;}
+.petal:nth-child(4){bottom:20px;right:25px;animation-delay:1.1s;transform:rotate(-30deg);}
+.petal:nth-child(5){top:50%;left:-10px;animation-delay:0.9s;width:10px;height:10px;}
+@keyframes petalFloat{0%{opacity:0;transform:translateY(10px) rotate(0deg);}60%{opacity:0.8;}100%{opacity:0.5;transform:translateY(-5px) rotate(20deg);}}
+
+.intro-text-wrap{text-align:center;animation:textRise 0.8s ease 1.2s both;}
+@keyframes textRise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.intro-main{font-family:var(--font-display);font-size:26px;color:var(--gold-deep);margin-bottom:6px;letter-spacing:0.02em;}
+.intro-sub{font-size:13px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;}
+.intro-month{
+  margin-top:16px;background:var(--gold);color:var(--text);
+  padding:7px 20px;border-radius:50px;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
+  animation:badgePop 0.5s cubic-bezier(0.34,1.6,0.64,1) 1.6s both;
+}
+@keyframes badgePop{from{opacity:0;transform:scale(0.5);}to{opacity:1;transform:scale(1);}}
+/* ─── LANGUAGE SCREEN ─── */
+#lang-screen{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  width:100%;
+  max-width:600px;
+  padding:40px 24px;
+  gap:10px;
+}
+
+/* Logo */
+.app-logo{
+  font-family:var(--font-display);
+  font-size:24px;
+  color:var(--gold-deep);
+  margin-bottom:4px;
+  text-align:center;
+  letter-spacing:0.5px;
+}
+
+/* Tagline */
+.app-tagline{
+  font-size:13px;
+  color:var(--text3);
+  margin-bottom:40px;
+  text-align:center;
+  opacity:0.9;
+}
+
+/* Language Cards */
+.lang-cards{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* Card */
+.lang-card{
+  background:var(--white);
+  border:1.5px solid var(--border);
+  border-radius:20px;
+  padding:26px 34px;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  text-align:center;
+  min-width:150px;
+
+  /* softer shadow */
+  box-shadow:0 4px 18px rgba(0,0,0,0.06);
+  backdrop-filter: blur(6px);
+}
+
+/* Hover */
+.lang-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 12px 28px rgba(245,200,66,0.18);
+}
+
+/* Active */
+.lang-card.active{
+  border-color:var(--gold);
+  background:linear-gradient(180deg, #FFFDF4, #FFF6D8);
+  box-shadow:0 8px 24px rgba(245,200,66,0.25);
+}
+
+/* Icon */
+.lang-flag{
+  font-size:30px;
+  display:block;
+  margin-bottom:8px;
+}
+
+/* Language name */
+.lang-name{
+  font-size:15px;
+  font-weight:600;
+  color:var(--text);
+  display:block;
+}
+
+/* Native */
+.lang-native{
+  font-size:12.5px;
+  color:var(--text3);
+  display:block;
+  margin-top:3px;
+}
+
+/* Button */
+.btn-primary{
+  background:linear-gradient(135deg, #F5C842, #E6B800);
+  color:#3a2e00;
+  border:none;
+  border-radius:50px;
+  padding:14px 42px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:34px;
+  transition:all 0.3s ease;
+  font-family:var(--font-en);
+
+  box-shadow:0 6px 20px rgba(245,200,66,0.35);
+}
+
+/* Button hover */
+.btn-primary:hover{
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:0 10px 28px rgba(245,200,66,0.45);
+}
+
+/* Button click */
+.btn-primary:active{
+  transform:scale(0.98);
+}
+/* ─── MAIN APP ─── */
+#main-app{display:none;flex-direction:column;align-items:center;width:100%;min-height:100vh;}
+.top-bar{width:100%;background:var(--white);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.top-logo{font-family:var(--font-display);font-size:16px;color:var(--gold-deep);}
+.lang-toggle-btn{background:var(--warm);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;color:var(--text2);transition:all 0.2s;font-family:inherit;}
+.lang-toggle-btn:hover{background:var(--gold-light);}
+.content-wrap{width:100%;max-width:620px;padding:32px 20px 60px;}
+
+/* Progress */
+.progress-bar-wrap{margin-bottom:32px;}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.progress-section{font-size:12px;color:var(--text3);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;}
+.progress-step{font-size:13px;color:var(--text2);}
+.progress-track{height:6px;background:var(--gold-light);border-radius:6px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-dark));border-radius:6px;transition:width 0.6s cubic-bezier(0.34,1.2,0.64,1);}
+
+/* Screens */
+.screen{display:none;animation:screenIn 0.45s cubic-bezier(0.34,1.2,0.64,1) forwards;}
+.screen.active{display:block;}
+@keyframes screenIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.screen-icon{font-size:32px;margin-bottom:16px;display:block;text-align:center;}
+.question-title{font-family:var(--font-display);font-size:22px;color:var(--text);margin-bottom:8px;line-height:1.4;}
+.question-sub{font-size:14px;color:var(--text2);margin-bottom:28px;line-height:1.6;}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.option{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;cursor:pointer;transition:all 0.25s ease;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.option:hover{border-color:var(--gold);background:var(--warm);transform:translateX(4px);}
+.option.selected{border-color:var(--gold);background:var(--gold-light);box-shadow:0 2px 12px rgba(245,200,66,0.2);}
+.option-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.option.selected .option-dot{background:var(--gold);border-color:var(--gold-dark);}
+.option-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--white);display:none;}
+.option.selected .option-dot::after{display:block;}
+.option-text{font-size:14px;color:var(--text);line-height:1.4;}
+
+/* Multi chips */
+.multi-options{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
+.multi-chip{background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:9px 16px;cursor:pointer;transition:all 0.25s ease;font-size:13px;color:var(--text2);}
+.multi-chip:hover{border-color:var(--gold);background:var(--warm);}
+.multi-chip.selected{border-color:var(--gold-dark);background:var(--gold-light);color:var(--text);font-weight:500;}
+
+/* Pain */
+.pain-scale{margin-bottom:28px;}
+.pain-display{text-align:center;margin-bottom:16px;}
+.pain-number{font-family:var(--font-display);font-size:48px;font-weight:600;color:var(--gold-deep);}
+.pain-label{font-size:14px;color:var(--text2);margin-top:4px;}
+.pain-slider{width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:8px;outline:none;cursor:pointer;margin-bottom:16px;background:linear-gradient(90deg,#4CAF7D 0%,#F5C842 50%,#E05252 100%);}
+.pain-slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--gold);border:3px solid var(--white);box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;}
+.pain-marks{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);}
+
+/* Note */
+.note-box{background:var(--warm);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:24px;font-size:13px;color:var(--text2);line-height:1.6;border-left:4px solid var(--gold);}
+
+/* Nav */
+.nav-row{display:flex;gap:12px;margin-top:8px;}
+.btn-back{background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:13px 22px;font-size:14px;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.btn-back:hover{background:var(--cream2);border-color:var(--gold);}
+.btn-next{flex:1;background:var(--gold);border:none;border-radius:50px;padding:14px;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;transition:all 0.3s ease;font-family:inherit;box-shadow:0 4px 16px rgba(245,200,66,0.3);}
+.btn-next:hover{background:var(--gold-dark);transform:translateY(-2px);}
+.btn-next:disabled{opacity:0.45;cursor:default;transform:none;box-shadow:none;}
+
+/* Illustration */
+.illus-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;}
+
+/* Symptom checkboxes */
+.sym-option{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;cursor:pointer;transition:all 0.25s ease;display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;}
+.sym-option:hover{border-color:var(--gold);background:var(--warm);}
+.sym-option.selected{border-color:var(--gold);background:var(--gold-light);}
+.sym-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.sym-option.selected .sym-check{background:var(--gold);border-color:var(--gold-dark);}
+.sym-check-mark{color:var(--white);font-size:12px;display:none;}
+.sym-option.selected .sym-check-mark{display:block;}
+.sym-text strong{display:block;font-size:14px;color:var(--text);font-weight:500;}
+.sym-text span{font-size:12px;color:var(--text3);}
+
+/* Results */
+.result-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;}
+.result-title{font-family:var(--font-display);font-size:17px;color:var(--text);margin-bottom:8px;}
+.score-bar{height:8px;background:var(--gold-light);border-radius:8px;overflow:hidden;margin:8px 0;}
+.score-fill{height:100%;border-radius:8px;transition:width 1s ease 0.3s;}
+.score-label{font-size:12px;color:var(--text3);}
+.urgency-badge{display:inline-block;padding:8px 20px;border-radius:50px;font-size:13px;font-weight:500;margin-bottom:20px;}
+.urgency-high{background:#FFF0F0;color:#C0392B;border:1px solid #F5BFBF;}
+.urgency-med{background:#FFFBE6;color:#7D5800;border:1px solid #F5E4A0;}
+.urgency-low{background:#F0FFF6;color:#1A6B3A;border:1px solid #A8E6C0;}
+.result-advice{font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px;}
+.cta-box{background:linear-gradient(135deg,var(--gold-light),var(--warm));border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;}
+.cta-title{font-family:var(--font-display);font-size:19px;color:var(--gold-deep);margin-bottom:8px;}
+.cta-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;}
+
+/* RTL */
+[lang="ar"]{direction:rtl;font-family:var(--font-ar);}
+[lang="ar"] .option:hover{transform:translateX(-4px);}
+[lang="ar"] .note-box{border-left:none;border-right:4px solid var(--gold);}
+[lang="ar"] .top-logo{font-family:var(--font-ar);}
+[lang="ar"] .btn-back{flex-direction:row-reverse;}
+</style>
+</head>
+<body>
+<div class="app" id="appRoot">
+
+<!-- ═══ INTRO — Yellow Awareness Ribbon ═══ -->
+<div id="intro">
+  <div class="ribbon-container">
+    <div class="ribbon-glow"></div>
+  
+    <div class="intro-icon">🎗️</div>
+  
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+  </div>
+  <div class="intro-text-wrap">
+    <div class="intro-main">Endo Awareness</div>
+    <div class="intro-sub">Self-Assessment Tool</div>
+    <div class="intro-month">March — Awareness Month</div>
+  </div>
+</div>
+<!-- ═══ LANGUAGE SCREEN ═══ -->
+<div id="lang-screen" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100%;max-width:600px;padding:40px 24px;">
+<div style="font-size:48px;margin-bottom:16px;text-align:center;">🎗️</div>
+<div class="app-logo">Endo Awareness</div>
+<div class="app-tagline">A safe space for understanding your body</div>
+<div style="font-size:14px;color:var(--text2);margin-bottom:20px;text-align:center;">Choose your language / اختاري لغتك</div>
+<div class="lang-cards">
+  <div class="lang-card active" onclick="selectLang('en',this)">
+    <span class="lang-flag">🌐</span>
+    <span class="lang-name">English</span>
+    <span class="lang-native">English</span>
+  </div>
+  <div class="lang-card" onclick="selectLang('ar',this)">
+    <span class="lang-flag">🌙</span>
+    <span class="lang-name" style="font-family:'Noto Naskh Arabic',serif;">العربية</span>
+    <span class="lang-native" style="font-family:'Noto Naskh Arabic',serif;">Arabic</span>
+  </div>
+</div>
+<button class="btn-primary" id="startBtn" onclick="startApp()">Begin Assessment →</button>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div id="main-app">
+<div class="top-bar">
+  <div class="top-logo" id="topLogo">🎗️ Endo Awareness</div>
+  <button class="lang-toggle-btn" onclick="switchLang()">🌐 EN / عر</button>
+</div>
+<div class="content-wrap">
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span class="progress-section" id="progSection">About</span>
+      <span class="progress-step" id="progStep">Intro</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- S0: Illustration -->
+  <div class="screen active" id="s0">
+    <span class="screen-icon">💛</span>
+    <div class="question-title" id="s0_title">Understanding Endometriosis</div>
+    <div class="question-sub" id="s0_sub">Endometriosis is often represented by the yellow ribbon and blooming flowers, symbolizing the growth of tissue beyond the uterus.</div>
+
+    <div class="illus-wrap">
+        <img src="https://s.raseef22.net/storage/attachments/1087/MAIN_endometriosis_awarness_month_460116.jpg/r/800/MAIN_endometriosis_awarness_month_460116.jpg" 
+             alt="Endometriosis Awareness" 
+             style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    </div>
+        <!-- Uterus body -->
+        <ellipse cx="260" cy="170" rx="70" ry="55" fill="#FADADD"/>
+        <ellipse cx="260" cy="170" rx="40" ry="30" fill="#F5B7B1" opacity="0.5"/>
+
+        <!-- Cervix -->
+        <rect x="248" y="220" width="24" height="32" rx="8" fill="#FADADD"/>
+
+        <!-- Left tube -->
+        <path d="M190 150 Q140 120 120 95" stroke="#F5A9B8" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+        <!-- Right tube -->
+        <path d="M330 150 Q380 120 400 95" stroke="#F5A9B8" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+        <!-- Ovaries -->
+        <ellipse cx="110" cy="85" rx="18" ry="14" fill="#FADADD"/>
+        <ellipse cx="410" cy="85" rx="18" ry="14" fill="#FADADD"/>
+      </svg>
+    </div>
+
+    <div class="note-box">
+      💡 <span id="s0_note">
+Endometriosis is often represented by the yellow ribbon and blooming flowers, symbolizing the growth of tissue beyond the uterus.      </span>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-next" onclick="goTo(1)">Start Assessment →</button>
+    </div>
+  </div>
+
+    <!-- S1: Pain Scale -->
+    <div class="screen" id="s1">
+      <span class="screen-icon">🌡️</span>
+      <div class="question-title" id="s1_title">How severe is your menstrual pain?</div>
+      <div class="question-sub" id="s1_sub">Drag the slider to rate your typical pain level during your period.</div>
+      <div class="pain-scale">
+        <div class="pain-display">
+          <div class="pain-number" id="painNum">5</div>
+          <div class="pain-label" id="painLbl">Moderate — noticeably uncomfortable</div>
+        </div>
+        <input type="range" class="pain-slider" id="painSlider" min="1" max="10" value="5" oninput="updatePain(this.value)">
+        <div class="pain-marks"><span>1 — Mild</span><span>5 — Moderate</span><span>10 — Disabling</span></div>
+      </div>
+      <div class="note-box">💛 <span id="s1_note">Pain ≥7 that interferes with daily activities is a key red flag for endometriosis.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(0)">← Back</button>
+        <button class="btn-next" onclick="goTo(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- S2: Daily Impact -->
+    <div class="screen" id="s2">
+      <span class="screen-icon">📅</span>
+      <div class="question-title" id="s2_title">How does pain affect your daily life?</div>
+      <div class="question-sub" id="s2_sub">Select the option that best describes your experience.</div>
+      <div class="options" id="opts_s2">
+        <div class="option" onclick="selectOpt(this,'s2')"><div class="option-dot"></div><div class="option-text" data-en="I continue normal activities with mild discomfort" data-ar="أكمل نشاطي اليومي مع انزعاج خفيف">I continue normal activities with mild discomfort</div></div>
+        <div class="option" onclick="selectOpt(this,'s2')"><div class="option-dot"></div><div class="option-text" data-en="I reduce activities but manage without medication" data-ar="أقلل النشاطات لكن أتعامل دون دواء">I reduce activities but manage without medication</div></div>
+        <div class="option" onclick="selectOpt(this,'s2')"><div class="option-dot"></div><div class="option-text" data-en="I need painkillers to function at all" data-ar="أحتاج مسكنات لمجرد أداء المهام الأساسية">I need painkillers to function at all</div></div>
+        <div class="option" onclick="selectOpt(this,'s2')"><div class="option-dot"></div><div class="option-text" data-en="I am bedridden and unable to work or study" data-ar="أبقى في السرير وغير قادرة على العمل أو الدراسة">I am bedridden and unable to work or study</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s2_note">Being bedridden during periods is NOT normal and warrants medical evaluation.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(1)" id="back_s2">← Back</button>
+        <button class="btn-next" onclick="goTo(3)" id="btn_s2" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S3: Pain Progression -->
+    <div class="screen" id="s3">
+      <span class="screen-icon">📈</span>
+      <div class="question-title" id="s3_title">Has your pain changed over time?</div>
+      <div class="question-sub" id="s3_sub">Think about the last 1–2 years.</div>
+      <div class="options" id="opts_s3">
+        <div class="option" onclick="selectOpt(this,'s3')"><div class="option-dot"></div><div class="option-text" data-en="Pain has stayed about the same" data-ar="الألم بقي على حاله تقريباً">Pain has stayed about the same</div></div>
+        <div class="option" onclick="selectOpt(this,'s3')"><div class="option-dot"></div><div class="option-text" data-en="Pain has gradually gotten worse" data-ar="الألم يزداد تدريجياً سوءاً">Pain has gradually gotten worse</div></div>
+        <div class="option" onclick="selectOpt(this,'s3')"><div class="option-dot"></div><div class="option-text" data-en="Pain has gotten significantly worse in the past year" data-ar="الألم تفاقم بشكل ملحوظ خلال العام الماضي">Pain has gotten significantly worse in the past year</div></div>
+        <div class="option" onclick="selectOpt(this,'s3')"><div class="option-dot"></div><div class="option-text" data-en="I've had pain since my very first period" data-ar="عندي ألم منذ أول دورة شهرية">I've had pain since my very first period</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s3_note">Progressive worsening of pain is a hallmark sign of endometriosis progression.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(2)">← Back</button>
+        <button class="btn-next" onclick="goTo(4)" id="btn_s3" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S4: Medications -->
+    <div class="screen" id="s4">
+      <span class="screen-icon">💊</span>
+      <div class="question-title" id="s4_title">Which pain medications do you use?</div>
+      <div class="question-sub" id="s4_sub">Select all that apply.</div>
+      <div class="multi-options">
+        <div class="multi-chip" onclick="toggleChip(this)">Paracetamol</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Ibuprofen</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Naproxen</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Diclofenac</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Mefenamic Acid</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Combination drugs</div>
+        <div class="multi-chip" onclick="toggleChip(this)">Herbal alternatives</div>
+        <div class="multi-chip" onclick="toggleChip(this)">None / no medication</div>
+      </div>
+      <div class="note-box">💛 <span id="s4_note">Using multiple painkillers or needing prescription-strength medication for period pain is not typical.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(3)">← Back</button>
+        <button class="btn-next" onclick="goTo(5)">Next →</button>
+      </div>
+    </div>
+
+    <!-- S5: Effectiveness -->
+    <div class="screen" id="s5">
+      <span class="screen-icon">⚗️</span>
+      <div class="question-title" id="s5_title">How effective are your pain medications?</div>
+      <div class="question-sub" id="s5_sub">Choose the answer that best describes your experience.</div>
+      <div class="options" id="opts_s5">
+        <div class="option" onclick="selectOpt(this,'s5')"><div class="option-dot"></div><div class="option-text" data-en="They completely relieve my pain" data-ar="تزيل الألم تماماً">They completely relieve my pain</div></div>
+        <div class="option" onclick="selectOpt(this,'s5')"><div class="option-dot"></div><div class="option-text" data-en="They help but I still have significant pain" data-ar="تساعد لكن لا يزال عندي ألم ملحوظ">They help but I still have significant pain</div></div>
+        <div class="option" onclick="selectOpt(this,'s5')"><div class="option-dot"></div><div class="option-text" data-en="They barely make a difference" data-ar="تكاد لا تفرق">They barely make a difference</div></div>
+        <div class="option" onclick="selectOpt(this,'s5')"><div class="option-dot"></div><div class="option-text" data-en="They don't work at all / I don't use medication" data-ar="لا تعمل أبداً / لا أستخدم دواء">They don't work at all / I don't use medication</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s5_note">Resistance to standard painkillers is a strong indicator that specialized evaluation is needed.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(4)">← Back</button>
+        <button class="btn-next" onclick="goTo(6)" id="btn_s5" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S6: GI effects -->
+    <div class="screen" id="s6">
+      <span class="screen-icon">🩺</span>
+      <div class="question-title" id="s6_title">Do pain medications cause stomach problems?</div>
+      <div class="question-sub" id="s6_sub">Long-term NSAID use can affect your gut.</div>
+      <div class="options" id="opts_s6">
+        <div class="option" onclick="selectOpt(this,'s6')"><div class="option-dot"></div><div class="option-text" data-en="No stomach issues at all" data-ar="لا توجد مشاكل في المعدة">No stomach issues at all</div></div>
+        <div class="option" onclick="selectOpt(this,'s6')"><div class="option-dot"></div><div class="option-text" data-en="Mild nausea or discomfort sometimes" data-ar="غثيان خفيف أو انزعاج أحياناً">Mild nausea or discomfort sometimes</div></div>
+        <div class="option" onclick="selectOpt(this,'s6')"><div class="option-dot"></div><div class="option-text" data-en="Regular stomach pain, acid reflux, or bloating" data-ar="ألم معدة منتظم، حموضة، أو انتفاخ">Regular stomach pain, acid reflux, or bloating</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s6_note">Consider taking NSAIDs with food or ask your doctor about gastroprotective options.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(5)">← Back</button>
+        <button class="btn-next" onclick="goTo(7)" id="btn_s6" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S7: Hormonal -->
+    <div class="screen" id="s7">
+      <span class="screen-icon">🌸</span>
+      <div class="question-title" id="s7_title">Have you used hormonal treatments for pain?</div>
+      <div class="question-sub" id="s7_sub">This includes birth control pills, hormonal IUD, or other hormonal therapy.</div>
+      <div class="options" id="opts_s7">
+        <div class="option" onclick="selectOpt(this,'s7')"><div class="option-dot"></div><div class="option-text" data-en="No, I have not tried hormonal treatment" data-ar="لا، لم أجرب العلاج الهرموني">No, I have not tried hormonal treatment</div></div>
+        <div class="option" onclick="selectOpt(this,'s7')"><div class="option-dot"></div><div class="option-text" data-en="Yes, and it significantly helped my pain" data-ar="نعم، وساعد كثيراً">Yes, and it significantly helped my pain</div></div>
+        <div class="option" onclick="selectOpt(this,'s7')"><div class="option-dot"></div><div class="option-text" data-en="Yes, but it didn't help much" data-ar="نعم، لكنه لم يساعد كثيراً">Yes, but it didn't help much</div></div>
+        <div class="option" onclick="selectOpt(this,'s7')"><div class="option-dot"></div><div class="option-text" data-en="Yes, but I stopped due to side effects" data-ar="نعم، لكنني توقفت بسبب الأعراض الجانبية">Yes, but I stopped due to side effects</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s7_note">Hormonal therapy response gives doctors important clues about the underlying cause of your pain.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(6)">← Back</button>
+        <button class="btn-next" onclick="goTo(8)" id="btn_s7" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S8: Chronic pelvic -->
+    <div class="screen" id="s8">
+      <span class="screen-icon">🔴</span>
+      <div class="question-title" id="s8_title">Do you have pelvic pain OUTSIDE your period?</div>
+      <div class="question-sub" id="s8_sub">Red flag symptoms that extend beyond menstruation.</div>
+      <div class="options" id="opts_s8">
+        <div class="option" onclick="selectOpt(this,'s8')"><div class="option-dot"></div><div class="option-text" data-en="No, pain only occurs during my period" data-ar="لا، الألم فقط أثناء الدورة">No, pain only occurs during my period</div></div>
+        <div class="option" onclick="selectOpt(this,'s8')"><div class="option-dot"></div><div class="option-text" data-en="Mild pelvic discomfort at other times" data-ar="ألم حوضي خفيف في أوقات أخرى">Mild pelvic discomfort at other times</div></div>
+        <div class="option" onclick="selectOpt(this,'s8')"><div class="option-dot"></div><div class="option-text" data-en="Significant pelvic pain throughout the month" data-ar="ألم حوضي ملحوظ طوال الشهر">Significant pelvic pain throughout the month</div></div>
+        <div class="option" onclick="selectOpt(this,'s8')"><div class="option-dot"></div><div class="option-text" data-en="Pain during or after sex (dyspareunia)" data-ar="ألم أثناء أو بعد العلاقة الزوجية">Pain during or after sex (dyspareunia)</div></div>
+      </div>
+      <div class="note-box">💛 <span id="s8_note">Chronic pelvic pain and pain during intercourse are strong indicators of endometriosis or related conditions.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(7)">← Back</button>
+        <button class="btn-next" onclick="goTo(9)" id="btn_s8" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- S9: Digestive -->
+    <div class="screen" id="s9">
+      <span class="screen-icon">🌿</span>
+      <div class="question-title" id="s9_title">Digestive & bladder symptoms during your cycle</div>
+      <div class="question-sub" id="s9_sub">Select all symptoms you experience, especially around your period.</div>
+      <div id="opts_s9">
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Severe bloating ("Endo-belly")</strong><span>Abdomen visibly distended, especially around period</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Diarrhea or constipation during period</strong><span>Cyclical bowel changes linked to your cycle</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Painful bowel movements during period</strong><span>Rectal pain or pressure when using the bathroom</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Frequent or painful urination during cycle</strong><span>Urgency, burning, or bladder pressure</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Blood in urine or stool during period</strong><span>Cyclic hematuria or rectal bleeding</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>None of these symptoms</strong><span></span></div></div>
+      </div>
+      <div class="note-box" style="margin-top:16px;">💡 <span id="s9_note">These symptoms suggest endometriosis may have spread to the bowel or bladder — common in deep infiltrating endometriosis.</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(8)">← Back</button>
+        <button class="btn-next" onclick="goTo(10)">Next →</button>
+      </div>
+    </div>
+
+    <!-- S10: Systemic -->
+    <div class="screen" id="s10">
+      <span class="screen-icon">⚡</span>
+      <div class="question-title" id="s10_title">Systemic & whole-body symptoms</div>
+      <div class="question-sub" id="s10_sub">Endometriosis can affect the whole body — not just the pelvis.</div>
+      <div id="opts_s10">
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Extreme fatigue around your period</strong><span>Far beyond normal tiredness; feels debilitating</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Shoulder or chest pain during period</strong><span>May indicate diaphragmatic endometriosis</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Nausea or vomiting with pain</strong><span>Severe pain causing autonomic response</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Low mood, anxiety or depression around cycle</strong><span>Emotional and mental health impact</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>Difficulty conceiving / fertility concerns</strong><span>Endometriosis is a leading cause of infertility</span></div></div>
+        <div class="sym-option" onclick="toggleSym(this)"><div class="sym-check"><span class="sym-check-mark">✓</span></div><div class="sym-text"><strong>None of these</strong><span></span></div></div>
+      </div>
+      <div class="note-box" style="margin-top:16px;">💡 <span id="s10_note">Endometriosis may affect organs beyond the uterus. Accurate answers help guide proper imaging (MRI or specialized ultrasound).</span></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goTo(9)">← Back</button>
+        <button class="btn-next" onclick="showResults()">See My Results →</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="screen" id="sResults">
+      <span class="screen-icon">📋</span>
+      <div class="question-title" id="res_title">Your Assessment Summary</div>
+      <div class="question-sub" id="res_sub">Based on your answers, here is what we observed. Please share this with a specialist.</div>
+      <div id="urgencyBadge" style="margin-bottom:20px;"></div>
+      <div class="result-card">
+        <div class="result-title" id="res_pain_title">Pain Profile</div>
+        <div class="score-bar"><div class="score-fill" id="painBar" style="background:linear-gradient(90deg,#4CAF7D,#E05252);width:0%"></div></div>
+        <div class="score-label" id="painBarLabel"></div>
+        <div class="result-advice" id="res_pain_advice"></div>
+      </div>
+      <div class="result-card">
+        <div class="result-title" id="res_sym_title">Symptom Burden</div>
+        <div class="score-bar"><div class="score-fill" id="symBar" style="background:linear-gradient(90deg,#F5C842,#C0392B);width:0%"></div></div>
+        <div class="score-label" id="symBarLabel"></div>
+        <div class="result-advice" id="res_sym_advice"></div>
+      </div>
+      <div class="result-card">
+        <div class="result-title" id="res_med_title">Medication & Treatment</div>
+        <div class="result-advice" id="res_med_advice"></div>
+      </div>
+      <div class="cta-box">
+        <div class="cta-title" id="cta_title">💛 Next Steps</div>
+        <div class="cta-sub" id="cta_sub">This tool is for awareness only — it does not replace medical diagnosis. Please bring your answers to a gynecologist or endometriosis specialist.</div>
+        <button class="btn-next" style="max-width:220px;margin:0 auto;" onclick="restartApp()" id="startOverBtn">Start Over</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+let currentLang='en', currentScreen=0, answers={}, painValue=5;
+const TOTAL=11;
+
+const T={
+  en:{
+    sections:['About Endometriosis','Pain Assessment','Pain Assessment','Pain Assessment','Medications','Medications','Medications','Medications','Red Flag Symptoms','Red Flag Symptoms','Systemic Symptoms','Results'],
+    steps:['Intro','Step 1 of 10','Step 2 of 10','Step 3 of 10','Step 4 of 10','Step 5 of 10','Step 6 of 10','Step 7 of 10','Step 8 of 10','Step 9 of 10','Step 10 of 10','Results'],
+    topLogo:'🎗️ Endo Awareness',
+    s0_title:'Understanding Endometriosis',s0_sub:"Endometriosis is often represented by the yellow ribbon and blooming flowers, symbolizing the growth of tissue beyond the uterus.",s0_note:'Endometriosis occurs when tissue similar to the uterine lining grows outside the uterus — on the ovaries, bowel, bladder, and beyond.',
+    s1_title:'How severe is your menstrual pain?',s1_sub:'Drag the slider to rate your typical pain level during your period.',s1_note:'Pain ≥7 that interferes with daily activities is a key red flag for endometriosis.',
+    s2_title:'How does pain affect your daily life?',s2_sub:'Select the option that best describes your experience.',s2_note:'Being bedridden during periods is NOT normal and warrants medical evaluation.',
+    s3_title:'Has your pain changed over time?',s3_sub:'Think about the last 1–2 years.',s3_note:'Progressive worsening of pain is a hallmark sign of endometriosis progression.',
+    s4_title:'Which pain medications do you use?',s4_sub:'Select all that apply.',s4_note:'Using multiple painkillers or needing prescription-strength medication for period pain is not typical.',
+    s5_title:'How effective are your pain medications?',s5_sub:'Choose the answer that best describes your experience.',s5_note:'Resistance to standard painkillers is a strong indicator that specialized evaluation is needed.',
+    s6_title:'Do pain medications cause stomach problems?',s6_sub:'Long-term NSAID use can affect your gut.',s6_note:'Consider taking NSAIDs with food or ask your doctor about gastroprotective options.',
+    s7_title:'Have you used hormonal treatments for pain?',s7_sub:'This includes birth control pills, hormonal IUD, or other hormonal therapy.',s7_note:'Hormonal therapy response gives doctors important clues about the underlying cause of your pain.',
+    s8_title:'Do you have pelvic pain OUTSIDE your period?',s8_sub:'Red flag symptoms that extend beyond menstruation.',s8_note:'Chronic pelvic pain and pain during intercourse are strong indicators of endometriosis or related conditions.',
+    s9_title:'Digestive & bladder symptoms during your cycle',s9_sub:'Select all symptoms you experience, especially around your period.',s9_note:'These symptoms suggest endometriosis may have spread to the bowel or bladder — common in deep infiltrating endometriosis.',
+    s10_title:'Systemic & whole-body symptoms',s10_sub:'Endometriosis can affect the whole body — not just the pelvis.',s10_note:'Endometriosis may affect organs beyond the uterus. Accurate answers help guide proper imaging (MRI or specialized ultrasound).',
+    res_title:'Your Assessment Summary',res_sub:'Based on your answers, here is what we observed. Please share this with a specialist.',
+    res_pain_title:'Pain Profile',res_sym_title:'Symptom Burden',res_med_title:'Medication & Treatment',
+    cta_title:'💛 Next Steps',cta_sub:'This tool is for awareness only — it does not replace medical diagnosis. Please bring your answers to a gynecologist or endometriosis specialist who can order the right imaging.',
+    startOver:'Start Over',backBtn:'← Back',
+    painLabels:{1:'Barely noticeable',2:'Very mild',3:'Mild — manageable',4:'Moderate-mild',5:'Moderate — noticeably uncomfortable',6:'Moderate-severe',7:'Severe — hard to ignore',8:'Very severe — hard to function',9:'Extreme pain',10:'Disabling — unbearable'},
+    urgHigh:'⚠️ High concern — please consult a specialist soon',urgMed:'🔶 Moderate concern — evaluation recommended',urgLow:'✅ Lower concern — monitor and track symptoms',
+    painBurden:'Estimated pain burden',symBurden:'Symptom burden',
+    medAdvice:'Medication effectiveness',medAdviceSuffix:'. Heavy reliance on painkillers warrants medical review.',
+    painAdviceHigh:'Your pain appears to significantly impact daily functioning. This level warrants urgent evaluation by a gynecologist specializing in endometriosis.',
+    painAdviceMed:'Your pain is affecting your quality of life. Consider seeking a gynecological evaluation.',
+    symAdviceHigh:'You report several symptoms beyond the pelvis, suggesting possible deep or widespread endometriosis. Specialized imaging (MRI or targeted ultrasound) is strongly recommended.',
+    symAdviceMed:'Some of your symptoms are worth discussing with your doctor.'
+  },
+  ar:{
+    sections:['عن بطانة الرحم المهاجرة','تقييم الألم','تقييم الألم','تقييم الألم','الأدوية','الأدوية','الأدوية','الأدوية','أعراض تحذيرية','أعراض تحذيرية','أعراض جهازية','النتائج'],
+    steps:['مقدمة','الخطوة ١ من ١٠','الخطوة ٢ من ١٠','الخطوة ٣ من ١٠','الخطوة ٤ من ١٠','الخطوة ٥ من ١٠','الخطوة ٦ من ١٠','الخطوة ٧ من ١٠','الخطوة ٨ من ١٠','الخطوة ٩ من ١٠','الخطوة ١٠ من ١٠','النتائج'],
+    topLogo:'🎗️ وعي بطانة الرحم المهاجرة',
+    s0_title:'فهم بطانة الرحم المهاجرة',s0_sub:'غالباً ما يتم تمثيل مرض بطانة الرحم المهاجرة بالشريط الأصفر والزهور المتفتحة، مما يرمز إلى نمو الأنسجة خارج الرحم.',s0_note:'بطانة الرحم المهاجرة يحدث عندما تنمو أنسجة مشابهة لبطانة الرحم خارجه — على المبايض والأمعاء والمثانة وأماكن أخرى.',
+    s1_title:'ما مدى شدة ألم دورتك الشهرية؟',s1_sub:'حركي المؤشر لتحديد مستوى ألمك المعتاد.',s1_note:'الألم ≥٧ الذي يؤثر على حياتك اليومية هو علامة تحذيرية رئيسية لبطانة الرحم المهاجرة.',
+    s2_title:'كيف يؤثر الألم على حياتك اليومية؟',s2_sub:'اختاري الخيار الذي يصف تجربتك بشكل أفضل.',s2_note:'البقاء في السرير أثناء الدورة ليس طبيعياً ويستلزم تقييماً طبياً.',
+    s3_title:'هل تغيّر ألمك مع مرور الوقت؟',s3_sub:'فكري في السنة إلى سنتين الماضيتين.',s3_note:'تفاقم الألم التدريجي هو علامة مميزة لتقدم بطانة الرحم المهاجرة.',
+    s4_title:'ما الأدوية التي تستخدمينها لتسكين الألم؟',s4_sub:'اختاري كل ما ينطبق عليكِ.',s4_note:'استخدام عدة مسكنات أو الحاجة لأدوية قوية لألم الدورة ليس أمراً طبيعياً.',
+    s5_title:'ما مدى فعالية مسكنات الألم؟',s5_sub:'اختاري الإجابة التي تصف تجربتك.',s5_note:'مقاومة المسكنات الاعتيادية مؤشر قوي على ضرورة تقييم متخصص.',
+    s6_title:'هل تسبب الأدوية مشاكل في المعدة؟',s6_sub:'الاستخدام طويل الأمد لمضادات الالتهاب يمكن أن يؤثر على الجهاز الهضمي.',s6_note:'فكري في تناول مضادات الالتهاب مع الطعام أو اسأل طبيبتك عن حماية المعدة.',
+    s7_title:'هل استخدمتِ علاجات هرمونية لتسكين الألم؟',s7_sub:'تشمل حبوب منع الحمل، اللولب الهرموني، أو أي علاج هرموني آخر.',s7_note:'استجابة الجسم للعلاج الهرموني تعطي الأطباء أدلة مهمة حول سبب الألم.',
+    s8_title:'هل تعانين من ألم حوضي خارج فترة الدورة؟',s8_sub:'أعراض تحذيرية تتجاوز فترة الحيض.',s8_note:'الألم الحوضي المزمن والألم أثناء العلاقة الزوجية من أقوى مؤشرات بطانة الرحم المهاجرة.',
+    s9_title:'أعراض الجهاز الهضمي والمثانة خلال دورتك',s9_sub:'اختاري كل الأعراض التي تشعرين بها، خاصة حول الدورة.',s9_note:'هذه الأعراض تشير إلى احتمال انتشار بطانة الرحم المهاجرة إلى الأمعاء أو المثانة.',
+    s10_title:'الأعراض الجهازية وتأثيرها على الجسم كله',s10_sub:'يمكن لبطانة الرحم المهاجرة أن يؤثر على الجسم كله — ليس فقط الحوض.',s10_note:'بطانة الرحم المهاجرة قد يؤثر على أعضاء خارج الرحم. إجاباتك الدقيقة تساعد في توجيه التصوير المناسب.',
+    res_title:'ملخص تقييمك',res_sub:'بناءً على إجاباتك، إليكِ ما لاحظناه. من فضلكِ شاركي هذا مع متخصصة.',
+    res_pain_title:'ملف الألم',res_sym_title:'عبء الأعراض',res_med_title:'الأدوية والعلاج',
+    cta_title:'💛 الخطوات التالية',cta_sub:'هذه الأداة للتوعية فقط — لا تغني عن التشخيص الطبي. من فضلكِ شاركي إجاباتك مع أخصائية نسائية أو متخصصة في بطانة الرحم المهاجرة.',
+    startOver:'ابدأ من جديد',backBtn:'رجوع →',
+    painLabels:{1:'لا يكاد يُلاحظ',2:'خفيف جداً',3:'خفيف — يمكن التحمل',4:'معتدل خفيف',5:'معتدل — مزعج بوضوح',6:'معتدل شديد',7:'شديد — يصعب تجاهله',8:'شديد جداً — صعب الأداء',9:'ألم قصوى',10:'معطل — لا يُطاق'},
+    urgHigh:'⚠️ قلق مرتفع — يُرجى استشارة أخصائية قريباً',urgMed:'🔶 قلق متوسط — يُنصح بالتقييم',urgLow:'✅ قلق منخفض — راقبي الأعراض وتابعيها',
+    painBurden:'درجة الألم المُقدَّرة',symBurden:'عبء الأعراض',
+    medAdvice:'فعالية الدواء',medAdviceSuffix:'. الاعتماد المفرط على المسكنات يستلزم مراجعة طبية.',
+    painAdviceHigh:'ألمكِ يبدو مؤثراً بشكل كبير على حياتك اليومية. هذا المستوى يستدعي تقييماً عاجلاً من أخصائية نسائية متخصصة في بطانة الرحم المهاجرة.',
+    painAdviceMed:'ألمكِ يؤثر على نوعية حياتك. يُنصح بطلب تقييم من أخصائية نسائية.',
+    symAdviceHigh:'لديكِ أعراض تتجاوز الحوض، مما يشير إلى احتمال وجود إندومتريوز عميق. يُنصح بإجراء تصوير بالرنين المغناطيسي أو تصوير متخصص.',
+    symAdviceMed:'بعض أعراضكِ تستحق المتابعة مع طبيبتك.'
+  }
+};
+function t(k){return(T[currentLang]||T.en)[k]||T.en[k]||k;}
+
+// Intro timing
+setTimeout(()=>{
+  document.getElementById('intro').style.display='none';
+  const ls=document.getElementById('lang-screen');
+  ls.style.display='flex';
+},3400);
+
+function selectLang(lang,el){
+  currentLang=lang;
+  document.querySelectorAll('.lang-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('startBtn').textContent=lang==='ar'?'ابدأي التقييم →':'Begin Assessment →';
+}
+
+function startApp(){
+  document.getElementById('lang-screen').style.display='none';
+  document.getElementById('main-app').style.display='flex';
+  document.getElementById('appRoot').lang=currentLang;
+  applyLang();
+  goTo(0);
+}
+
+function switchLang(){
+  currentLang=currentLang==='en'?'ar':'en';
+  document.getElementById('appRoot').lang=currentLang;
+  applyLang();
+  renderScreen(currentScreen);
+}
+
+function applyLang(){
+  const isAr=currentLang==='ar';
+  document.body.style.fontFamily=isAr?'var(--font-ar)':'var(--font-en)';
+  document.getElementById('topLogo').textContent=t('topLogo');
+  document.querySelectorAll('.option-text').forEach(el=>{
+    const txt=el.getAttribute('data-'+currentLang);
+    if(txt)el.textContent=txt;
+  });
+  // Back buttons
+  document.querySelectorAll('.btn-back').forEach(b=>{
+    if(!b.id||b.id==='')b.textContent=t('backBtn');
+  });
+}
+
+function goTo(n){
+  const prev=document.getElementById('s'+currentScreen)||document.getElementById('sResults');
+  if(prev)prev.classList.remove('active');
+  currentScreen=n;
+  const next=document.getElementById('s'+n);
+  if(!next)return;
+  next.classList.remove('active');
+  void next.offsetWidth;
+  next.classList.add('active');
+  updateProgress(n);
+  renderScreen(n);
+  window.scrollTo(0,0);
+}
+
+function updateProgress(n){
+  const pct=Math.round((n/TOTAL)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progSection').textContent=t('sections')[n]||'';
+  document.getElementById('progStep').textContent=t('steps')[n]||'';
+}
+
+function renderScreen(n){
+  const keys=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+  if(n<keys.length){
+    const k=keys[n];
+    ['_title','_sub','_note'].forEach(sfx=>{
+      const el=document.getElementById(k+sfx);
+      if(el)el.textContent=t(k+sfx);
+    });
+  }
+  if(n===1){updatePain(painValue);document.getElementById('painSlider').value=painValue;}
+  // Back buttons text
+  document.querySelectorAll('.btn-back').forEach(b=>{b.textContent=t('backBtn');});
+}
+
+function updatePain(v){
+  painValue=parseInt(v);
+  answers.pain=painValue;
+  document.getElementById('painNum').textContent=painValue;
+  document.getElementById('painLbl').textContent=t('painLabels')[painValue]||'';
+  const pct=(painValue-1)/9;
+  const r=Math.round(76+pct*(224-76));
+  const g=Math.round(175+pct*(82-175));
+  document.getElementById('painNum').style.color=`rgb(${r},${g},50)`;
+}
+
+function selectOpt(el,sid){
+  el.parentElement.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[sid]=el.querySelector('.option-text').textContent;
+  const btn=document.getElementById('btn_'+sid);
+  if(btn)btn.disabled=false;
+}
+
+function toggleChip(el){el.classList.toggle('selected');}
+function toggleSym(el){el.classList.toggle('selected');}
+
+function showResults(){
+  document.getElementById('s10').classList.remove('active');
+  currentScreen=11;
+  document.getElementById('progFill').style.width='100%';
+  document.getElementById('progSection').textContent=currentLang==='ar'?'النتائج':'Results';
+  document.getElementById('progStep').textContent=currentLang==='ar'?'اكتمل':'Complete';
+
+  const painScore=painValue||5;
+  const impactMap={'bedridden':4,'cannot':4,'need painkillers':3,'مسكنات':3,'أبقى في السرير':4,'reduce activities':2,'أقلل':2,'continue':1,'أكمل':1};
+  let impactScore=2;
+  for(const[k,v]of Object.entries(impactMap)){if((answers.s2||'').includes(k)){impactScore=v;break;}}
+  const effectMap={"don't work":3,'لا تعمل':3,'barely':3,'تكاد':3,'help but':2,'تساعد':2,'completely':1,'تزيل':1};
+  let effectScore=1;
+  for(const[k,v]of Object.entries(effectMap)){if((answers.s5||'').includes(k)){effectScore=v;break;}}
+  const chronicMap={'Significant pelvic':3,'ألم حوضي ملحوظ':3,'Pain during or after':3,'ألم أثناء':3,'Mild pelvic':2,'ألم حوضي خفيف':2};
+  let chronicScore=1;
+  for(const[k,v]of Object.entries(chronicMap)){if((answers.s8||'').includes(k)){chronicScore=v;break;}}
+  const sympCount=document.querySelectorAll('#opts_s9 .sym-option.selected,#opts_s10 .sym-option.selected').length;
+  const symScore=Math.min(sympCount,5);
+  const totalPain=painScore+impactScore*1.5+effectScore;
+  const totalSym=chronicScore+symScore;
+  const maxPain=10+4*1.5+3;const maxSym=3+5;
+  const painPct=Math.min(100,Math.round((totalPain/maxPain)*100));
+  const symPct=Math.min(100,Math.round((totalSym/maxSym)*100));
+  const overall=(painPct+symPct)/2;
+  let urgency=overall>=65||(painScore>=8)||(symScore>=4)?'High':overall>=40||(painScore>=6)||(symScore>=2)?'Med':'Low';
+
+  const sR=document.getElementById('sResults');
+  sR.style.display='block';
+  sR.classList.remove('active');
+  void sR.offsetWidth;
+  sR.classList.add('active');
+
+  ['res_title','res_sub','res_pain_title','res_sym_title','res_med_title','cta_title','cta_sub'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=t(id.replace('_','_'));
+  });
+  document.getElementById('res_title').textContent=t('res_title');
+  document.getElementById('res_sub').textContent=t('res_sub');
+  document.getElementById('res_pain_title').textContent=t('res_pain_title');
+  document.getElementById('res_sym_title').textContent=t('res_sym_title');
+  document.getElementById('res_med_title').textContent=t('res_med_title');
+  document.getElementById('cta_title').textContent=t('cta_title');
+  document.getElementById('cta_sub').textContent=t('cta_sub');
+  document.getElementById('startOverBtn').textContent=t('startOver');
+
+  const ub=document.getElementById('urgencyBadge');
+  ub.className='urgency-badge urgency-'+urgency.toLowerCase();
+  ub.textContent=t('urg'+urgency);
+
+  setTimeout(()=>{
+    document.getElementById('painBar').style.width=painPct+'%';
+    document.getElementById('symBar').style.width=symPct+'%';
+  },100);
+  document.getElementById('painBarLabel').textContent=t('painBurden')+': '+painPct+'%';
+  document.getElementById('symBarLabel').textContent=t('symBurden')+': '+symPct+'%';
+  document.getElementById('res_pain_advice').textContent=urgency==='High'?t('painAdviceHigh'):t('painAdviceMed');
+  document.getElementById('res_sym_advice').textContent=symScore>=3?t('symAdviceHigh'):t('symAdviceMed');
+  const medTxt=answers.s5?t('medAdvice')+': '+answers.s5+t('medAdviceSuffix'):currentLang==='ar'?'لم يتم الإجابة على سؤال الدواء.':'Medication response not recorded.';
+  document.getElementById('res_med_advice').textContent=medTxt;
+  window.scrollTo(0,0);
+}
+
+function restartApp(){
+  answers={};painValue=5;currentScreen=0;
+  document.getElementById('sResults').style.display='none';
+  document.getElementById('sResults').classList.remove('active');
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+  document.querySelectorAll('.multi-chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.sym-option').forEach(s=>s.classList.remove('selected'));
+  document.querySelectorAll('[id^="btn_"]').forEach(b=>{if(b.hasAttribute('disabled')||b.disabled)b.disabled=true;});
+  document.getElementById('btn_s2').disabled=true;
+  document.getElementById('btn_s3').disabled=true;
+  document.getElementById('btn_s5').disabled=true;
+  document.getElementById('btn_s6').disabled=true;
+  document.getElementById('btn_s7').disabled=true;
+  document.getElementById('btn_s8').disabled=true;
+  const sl=document.getElementById('painSlider');if(sl)sl.value=5;
+  goTo(0);
+}
+</script>
+</body>
+</html>
