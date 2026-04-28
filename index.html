@@ -246,7 +246,7 @@ body{background:var(--cream);font-family:var(--font-en);color:var(--text);min-he
       </div>
       <div class="form-group" style="max-width:100px;">
         <label class="form-label" id="pi_age_lbl">Age</label>
-        <input class="form-input" id="pi_age" type="number" min="10" max="60" placeholder="25">
+        <input class="form-input" id="pi_age" type="number" min="10" max="60" placeholder=" ">
       </div>
     </div>
 
@@ -412,9 +412,7 @@ body{background:var(--cream);font-family:var(--font-en);color:var(--text);min-he
       <div class="question-title" id="s5_title">Which medications do you usually use to relieve pain?</div>
       <div class="question-sub" id="s5_sub">Select all that apply.</div>
       <div class="multi-options" id="opts_s5_multi">
-        <div class="multi-chip" onclick="toggleChip(this)" data-val="Paracetamol">
-          <span>Paracetamol</span><span class="chip-brand">Panadol, Revanin</span>
-        </div>
+      
         <div class="multi-chip" onclick="toggleChip(this)" data-val="Ibuprofen">
           <span>Ibuprofen</span><span class="chip-brand">Advil, Brufen</span>
         </div>
@@ -697,6 +695,7 @@ body{background:var(--cream);font-family:var(--font-en);color:var(--text);min-he
       </div>
 
       <!-- Score bars -->
+      
       <div class="result-section">
         <div class="result-section-header">
           <span class="result-section-icon">📊</span>
@@ -948,7 +947,7 @@ function applyPatientInfoLang(){
   document.getElementById('r_single').textContent=t('r_single');
   document.getElementById('r_married').textContent=t('r_married');
   document.getElementById('startAssessBtn').textContent=t('startAssessBtn');
-  document.getElementById('pi_name').placeholder=isAr?'مثال: يقين يوسف  ':'e.g. Yaqeen Yousef';
+  document.getElementById('pi_name').placeholder=isAr?' ':'';
 }
 
 function startAssessment(){
